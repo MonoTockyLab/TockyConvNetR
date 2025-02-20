@@ -383,6 +383,7 @@ plotInverseGradCAM <- function(x, feature_matrix, xaxis = 'Red_log', yaxis = 'Bl
 #' @param group A character vector specifying the group(s) to use for analysis. If NULL, all groups are used.
 #' @param select A logical indicating whether to allow interactive selection of variables for analysis.
 #' @param variables A character vector specifying the variables to analyze. Only used if `select` is TRUE.
+#' @param title A character for the title of plot.
 #'
 #' @return A list containing the following elements:
 #'   * `plot`: A ggplot object of the boxplot.
@@ -483,10 +484,12 @@ plotGradCAMFeatureMFI  <-  function(x, feature_vector, group = NULL, select = FA
 #' It is adaptable to any number of cell_cluster_id.
 #'
 #' @param x TockyPrepData object (required for "gating" mode)
+#' @param feature_matrix Feature intensity matrix from Grad-CAM analysis
 #' @param p_adjust_method A method for p-value adjustment in multiple testing using Mann Whitney.
 #' clusteringFeatureCells cen be used.
 #' @param min_cells Numeric. The minimum nunmber of cells within a cluster to be analysed. The default is 10.
 #' @param ncol Number of columns in output figure panel.
+#' @param title A character for the title of plot.
 #' @param Timer_positive Logical. Whether to remove Timer negative cells.
 #' @param ylim Optional. A numeric vector of the length 2 for specifying ylim.
 #' @importFrom graphics plot polygon points text
@@ -506,10 +509,10 @@ plotGradCAMFeatureMFI  <-  function(x, feature_vector, group = NULL, select = FA
 #'   plotGradCAMFeatureCells(data, cell_cluster_id)
 #' }
 #' @export
-plotGradCAMFeatureCells <- function(x, feature_cells, p_adjust_method = "BH", ncol = 3, min_cells = 10, title = 'GradCAM Feature Cells', Timer_positive = TRUE, ylim = NULL) {
+plotGradCAMFeatureCells <- function(x, feature_matrix, p_adjust_method = "BH", ncol = 3, min_cells = 10, title = 'GradCAM Feature Cells', Timer_positive = TRUE, ylim = NULL) {
     
-    feature_cells <- as.numeric(feature_cells)
-    clusters <- ifelse(feature_cells == 1, "Feature", 'Others')
+    feature_matrix <- as.numeric(feature_matrix)
+    clusters <- ifelse(feature_matrix == 1, "Feature", 'Others')
     
     data <- x@Data
     if(Timer_positive){
@@ -526,29 +529,27 @@ plotGradCAMFeatureCells <- function(x, feature_cells, p_adjust_method = "BH", nc
     data <- merge(data, sampledef, merge = 'file')
     
     data_percent <- data %>%
-        group_by(file, Cluster, .data$group) %>%
+        group_by(.data$file, .data$Cluster, .data$group) %>%
         summarise(Count = n(), .groups = 'drop') %>%
-        group_by(file) %>%
+        group_by(.data$file) %>%
         mutate(Total = sum(.data$Count)) %>%
         ungroup() %>%
-        mutate(Percentage = (.data$Count / .data$Total) * 100) %>%
-        select(file, Cluster, .data$group, Percentage)
-
+        mutate(Percentage = (.data$Count / .data$Total) * 100)# %>%
+       # select(file, Cluster, .data$group, Percentage)
+       data_percent <- data_percent[, c('file', 'Cluster', 'group', 'Percentage')]
     data_percent <- data_percent[data_percent$Cluster == "Feature",]
-    
+
     summary_data <- data_percent %>%
-    select(file, Cluster, group) %>%
-    distinct() %>%
-    left_join(data_percent, by = c("file", "Cluster", "group")) %>%
-    group_by(group, Cluster) %>%
-    summarise(
-    Ave_Percentage = mean(Percentage, na.rm = TRUE),
-    SD = sd(Percentage, na.rm = TRUE)
-    )
-    
+      distinct(.data$file, .data$Cluster, .data$group) %>%
+      left_join(data_percent, by = c("file" = "file", "Cluster" = "Cluster", "group" = "group")) %>%
+      group_by(.data$group, .data$Cluster) %>%
+      summarise(
+        Ave_Percentage = mean(.data$Percentage, na.rm = TRUE),
+        SD = sd(.data$Percentage, na.rm = TRUE),
+        .groups = 'drop'
+      )
+
     mw_test <- wilcox.test(Percentage ~ group, data = data_percent)
-    
-    
     
     p <- ggplot(data_percent, aes(x = !!sym("group"), y = !!sym("Percentage"), fill = !!sym("group"))) +
     geom_violin(trim = FALSE, alpha = 0.7, adjust = 1.5, width = 1.1)+
