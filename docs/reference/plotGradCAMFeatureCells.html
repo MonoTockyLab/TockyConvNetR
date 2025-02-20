@@ -71,7 +71,6 @@ It is adaptable to any number of cell_cluster_id.</p>
 <span>  p_adjust_method <span class="op">=</span> <span class="st">"BH"</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  min_cells <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  scatter_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"GradCAM Feature Cells"</span>,</span>
 <span>  Timer_positive <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -82,7 +81,11 @@ It is adaptable to any number of cell_cluster_id.</p>
     <h2>Arguments</h2>
 
 
-<dl><dt id="arg-p-adjust-method">p_adjust_method<a class="anchor" aria-label="anchor" href="#arg-p-adjust-method"></a></dt>
+<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
+<dd><p>TockyPrepData object (required for "gating" mode)</p></dd>
+
+
+<dt id="arg-p-adjust-method">p_adjust_method<a class="anchor" aria-label="anchor" href="#arg-p-adjust-method"></a></dt>
 <dd><p>A method for p-value adjustment in multiple testing using Mann Whitney.
 clusteringFeatureCells cen be used.</p></dd>
 
@@ -95,21 +98,12 @@ clusteringFeatureCells cen be used.</p></dd>
 <dd><p>Numeric. The minimum nunmber of cells within a cluster to be analysed. The default is 10.</p></dd>
 
 
-<dt id="arg-scatter-plot">scatter_plot<a class="anchor" aria-label="anchor" href="#arg-scatter-plot"></a></dt>
-<dd><p>Logical. If TRUE, scatter plot for Angle and Intensity is generated.</p></dd>
-
-
 <dt id="arg-timer-positive">Timer_positive<a class="anchor" aria-label="anchor" href="#arg-timer-positive"></a></dt>
 <dd><p>Logical. Whether to remove Timer negative cells.</p></dd>
 
 
 <dt id="arg-ylim">ylim<a class="anchor" aria-label="anchor" href="#arg-ylim"></a></dt>
 <dd><p>Optional. A numeric vector of the length 2 for specifying ylim.</p></dd>
-
-
-<dt id="arg-res-tockyrf">res_tockyrf<a class="anchor" aria-label="anchor" href="#arg-res-tockyrf"></a></dt>
-<dd><p>A list object output from `TockyKmeansRF`, which has been further processed
-using `ClusteringFeatureCells`.</p></dd>
 
 </dl></div>
 

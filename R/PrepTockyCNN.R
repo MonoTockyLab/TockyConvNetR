@@ -1,177 +1,26 @@
-#' Sample Splitting for CNN model Using Image Conversion
-#' The function produces 100x100 image matrices, where the position (i, j) in the matrix corresponds to the count of points that fall into the i-th 'Angle' bin and j-th 'Intensity' bin.
-#' @param x A TockyPrepData object
-#' @param train_size The ratio of training/validation dataset: test_dataset (e.g. 0.8 for training/validation:test = 80:20).
-#' @param valid_size The ratio of training dataset: valid dataset
-#' @param test Whether to generate test data
-#' @param n_resolution The number of bins to be used. The default is 100, i.e. the resolution of output images is 100 x 100.
-#' @return An updated TockyPrepData object containing train, validation, and test datasets
-#' @export
-#' @examples
-#' \dontrun{
-#' x  <-  PrepTockyCNN(x)
-#'}
-#' @importFrom reticulate import array_reshape
-#' @importFrom dplyr group_by ungroup filter n_distinct pull rowwise mutate summarise %>% .data
-#' @importFrom utils read.table write.table
-#' @importFrom methods show
-#' @importClassesFrom TockyPrep TockyPrepData
-
-PrepTockyCNN <- function(x, train_size = 0.8, test = TRUE, valid_size = 0.2, n_resolution = 100){
-    if(!inherits(x, 'TockyPrepData')){
-        stop("Use a TockyPrepData object. \n")
-        
-    }
-    
-    data <- x@Data
-    sampledef <- x@sampledef$sampledef
-    merged_data <- merge(data, sampledef, by = "file")
-    
-    if(test){
-        tmp <- train_size
-    }else{
-        tmp <- 1
-    }
-    
-    split_data <- function(data) {
-        files_per_group <- data %>%
-            dplyr::group_by(.data$group) %>%
-            dplyr::summarise(num_files = n_distinct(.data$file), .groups = 'drop') %>%
-            dplyr::mutate(num_train_valid_files = round(tmp * .data$num_files))
-        
-        train_valid_files <- files_per_group %>%
-            dplyr::rowwise() %>%
-            dplyr::mutate(sampled_files = list(sample(unique(data$file[data$group == .data$group]),
-            size = .data$num_train_valid_files, replace = FALSE))) %>%
-            dplyr::ungroup() %>%
-            dplyr::pull(.data$sampled_files) %>%
-            unlist()
-        
-        train_valid <- data %>%
-            dplyr::filter(.data$file %in% train_valid_files)
-        test_data <- data %>%
-            dplyr::filter(!(.data$file %in% train_valid_files))
-        
-        list(train_valid = train_valid, test = test_data)
-    }
-    
-    data_splits <- split_data(merged_data)
-    data_train_valid <- data_splits$train_valid
-    test_data <- data_splits$test
-    
-    
-    cat("Number of cells in training/validation set:", nrow(data_train_valid), "\n")
-    cat("Number of cells in testing set:", nrow(test_data), "\n")
-    cat("Number of unique samples in training/validation set:", n_distinct(data_train_valid$file), "\n")
-    cat("Number of unique samples in testing set:", n_distinct(test_data$file), "\n")
-    
-    print_distribution <- function(data, dataset_name) {
-        cat("\nDistribution in", dataset_name, "\n")
-        cat("-------------------------------\n")
-        cat("Group:\n")
-        print(table(data$group) / nrow(data) * n_resolution)
-    }
-    print_distribution(data_train_valid, "Training/Validation")
-    
-    if(test){
-        print_distribution(test_data, "Test")
-    }
-    
-    set.seed(123)
-    unique_files_df <- unique(data_train_valid[, c("file", "group")])
-    
-    sample_train_files <- function(group_name) {
-        sample(unique_files_df$file[unique_files_df$group == group_name],
-        size = round((1-valid_size) * sum(unique_files_df$group == group_name)))
-    }
-    
-    train_files <- unlist(lapply(unique(unique_files_df$group), sample_train_files))
-    valid_files <- setdiff(unique_files_df$file, train_files)
-    
-    train_data <- data_train_valid[data_train_valid$file %in% train_files, ]
-    valid_data <- data_train_valid[!data_train_valid$file %in% train_files, ]
-    
-    if(test){
-        show(table(valid_data$group[duplicated(test_data$file) == FALSE]))
-        cat("\n")
-        cat("Test data: \n")
-        show(table(test_data$group))
-        cat("\n")
-    }else{
-        show(table(valid_data$group))
-        
-        cat("\n")
-    }
-    
-    cat("Dimensions of training data:", dim(train_data), "\n")
-    cat("Dimensions of validation data:", dim(valid_data), "\n")
-    
-    generate_label_matrix <- function(data) {
-        unique_files <- unique(data$file)
-        unique_groups <- unique(data$group)
-        label_matrix <- matrix(0, nrow=length(unique_files), ncol=length(unique_groups))
-        colnames(label_matrix) <- unique_groups
-        rownames(label_matrix) <- unique_files
-        
-        for(i in 1:nrow(label_matrix)) {
-            file <- rownames(label_matrix)[i]
-            group_for_file <- data$group[data$file == file]
-            label_matrix[i, group_for_file] <- 1
-        }
-        
-        return(label_matrix)
-    }
-    
-    train_labels <- generate_label_matrix(train_data)
-    valid_labels <- generate_label_matrix(valid_data)
-    cat("Sample numbers of training data: \n")
-    show(colSums(train_labels))
-    cat("Sample numbers of validation data: \n")
-    show(colSums(valid_labels))
-    test_labels <- NULL
-    if (test) {
-        test_labels <- generate_label_matrix(test_data)
-        cat("Sample numbers of test data: \n")
-        show(colSums(test_labels))
-    }
-    
-    cn <- colnames(train_labels)
-    train_labels <- train_labels[,cn]
-    valid_labels <- valid_labels[,cn]
-    
-    if (test) {
-        test_labels <- test_labels[,cn]
-        
-        out <- list(train_data = train_data,
-        valid_data = valid_data,
-        test_data = test_data,
-        train_labels = train_labels,
-        valid_labels = valid_labels,
-        test_labels = test_labels)
-    }else{
-        out <- list(train_data = train_data,
-        valid_data = valid_data,
-        train_labels = train_labels,
-        valid_labels = valid_labels)
-    }
-    
-    np <- import('numpy')
-    np$save('train_labels.npy', train_labels)
-    np$save('valid_labels.npy', valid_labels)
-    
-    write.csv(train_labels, file = 'train_labels.csv')
-    write.csv(valid_labels, file = 'valid_labels.csv')
-    if (test) {
-        np$save('test_labels.npy', test_labels)
-        write.csv(test_labels, file='test_labels.csv')
-    }
-    
-    x@Tocky[['PrepTockyCNN']] <- out
-    
-    return(invisible(x))
-}
-
-
+# ==============================================================================
+# Title:       TockyConvNetR
+# Description: Convolutional Neural Network-Based Machine Learning Methods for Analyzing Flow Cytometric Fluorescent Timer Data
+# Version:     0.1.0
+# Author:      Masahiro Ono
+# Created:     20 February 2025
+# Modified:    20 February 2025
+#
+# Copyright (C) 2025 Masahiro Ono
+#
+# NOTICE:  All rights are reserved, including all intellectual property and patent rights.
+# A patent application has been filed related to the methodologies employed within this code.
+#
+# The code is available on GitHub without a standard licensing option, intended for
+# public viewing and verification related to the associated academic publication. No
+# rights are granted for the use, modification, or distribution of the code for any
+# purposes without explicit permission from Masahiro Ono, Imperial College London.
+#
+# For permissions or inquiries, please contact: m.ono@imperial.ac.uk
+#
+# This software is distributed WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# ==============================================================================
 
 #' Normalize a matrix
 #'

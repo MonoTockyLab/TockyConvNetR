@@ -7,7 +7,7 @@
 <img src="vignettes/assets/LogoTockyConvNetR.jpg" align="center"   width=25%>
 
 
-The **TockyConvNetR** R package is part of the **TockyMachineLearning** package suite.
+The **TockyConvNetR** R package is part of the [**TockyMachineLearning**](https://monotockylab.github.io/TockyMachineLearning/) package suite.
 
 The **TockyMachineLearning** package suite comprises several subpackages designed to facilitate advanced machine learning analyses of flow cytometric data from Fluorescent Timer reporters. Each package within the suite specializes in different aspects of data handling and analysis:
 
@@ -21,7 +21,34 @@ Below is a schematic figure providing an overview of the workflows and interacti
 
 <img src="vignettes/assets/Overview.jpg" align="center" width=100%>
 
+### Link to GitHub Pages:
 
+<div style="display: flex; justify-content: space-between;">
+  <div style="width: 30%; padding: 10px;">
+    <h3>TockyRandomForest</h3>
+    <p>
+	<a href="https://MonoTockyLab.github.io/TockyRandomForest">
+	  <img src="assets/LogoTockyRandomForest.jpg" align="center" width="100%">
+	</a>
+	</p>
+  </div>
+  <div style="width: 30%; padding: 10px;">
+    <h3>TockyConvNetR</h3>
+    <p>
+	<a href="https://MonoTockyLab.github.io/TockyConvNetR">
+	  <img src="assets/LogoTockyConvNetR.jpg" align="center" width="75%">
+	</a>
+	</p>
+  </div>
+  <div style="width: 30%; padding: 10px;">
+    <h3>TockyConvNetPy</h3>
+    <p>
+	<a href="https://MonoTockyLab.github.io/TockyConvNetPy">
+	  <img src="assets/LogoTockyConvNetPy.jpg" align="center" width="75%">
+	</a>
+	</p>
+  </div>
+</div>
 
 
 

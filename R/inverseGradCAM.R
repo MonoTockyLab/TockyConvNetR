@@ -1,3 +1,27 @@
+# ==============================================================================
+# Title:       TockyConvNetR
+# Description: Convolutional Neural Network-Based Machine Learning Methods for Analyzing Flow Cytometric Fluorescent Timer Data
+# Version:     0.1.0
+# Author:      Masahiro Ono
+# Created:     20 February 2025
+# Modified:    20 February 2025
+#
+# Copyright (C) 2025 Masahiro Ono
+#
+# NOTICE:  All rights are reserved, including all intellectual property and patent rights.
+# A patent application has been filed related to the methodologies employed within this code.
+#
+# The code is available on GitHub without a standard licensing option, intended for
+# public viewing and verification related to the associated academic publication. No
+# rights are granted for the use, modification, or distribution of the code for any
+# purposes without explicit permission from Masahiro Ono, Imperial College London.
+#
+# For permissions or inquiries, please contact: m.ono@imperial.ac.uk
+#
+# This software is distributed WITHOUT ANY WARRANTY; without even the implied
+# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# ==============================================================================
+
 #' Integrated Grad-CAM Feature Cell Identification
 #'
 #' Identifies significant feature cells using Grad-CAM data either with visualization (gating mode)
@@ -458,12 +482,10 @@ plotGradCAMFeatureMFI  <-  function(x, feature_vector, group = NULL, select = FA
 #' This function processes clustering results, plots each cluster, and overlays each cluster's convex hull.
 #' It is adaptable to any number of cell_cluster_id.
 #'
-#' @param res_tockyrf A list object output from `TockyKmeansRF`, which has been further processed
-#'        using `ClusteringFeatureCells`.
+#' @param x TockyPrepData object (required for "gating" mode)
 #' @param p_adjust_method A method for p-value adjustment in multiple testing using Mann Whitney.
 #' clusteringFeatureCells cen be used.
 #' @param min_cells Numeric. The minimum nunmber of cells within a cluster to be analysed. The default is 10.
-#' @param scatter_plot Logical. If TRUE, scatter plot for Angle and Intensity is generated.
 #' @param ncol Number of columns in output figure panel.
 #' @param Timer_positive Logical. Whether to remove Timer negative cells.
 #' @param ylim Optional. A numeric vector of the length 2 for specifying ylim.
@@ -472,8 +494,7 @@ plotGradCAMFeatureMFI  <-  function(x, feature_vector, group = NULL, select = FA
 #' @importFrom grDevices chull
 #' @importFrom stats wilcox.test p.adjust sd setNames
 #' @importFrom ggplot2 ggplot geom_boxplot geom_violin labs geom_jitter theme_bw aes ylim theme element_text
-#' @importFrom dplyr group_by summarise mutate ungroup select distinct left_join n
-#' @importFrom magrittr %>%
+#' @importFrom dplyr group_by summarise mutate ungroup select distinct left_join n %>%
 #' @importFrom gridExtra grid.arrange
 #' @importClassesFrom TockyPrep TockyPrepData
 #'
@@ -484,7 +505,7 @@ plotGradCAMFeatureMFI  <-  function(x, feature_vector, group = NULL, select = FA
 #'   plotGradCAMFeatureCells(data, cell_cluster_id)
 #' }
 #' @export
-plotGradCAMFeatureCells <- function(x, feature_cells, p_adjust_method = "BH", ncol = 3, min_cells = 10, scatter_plot = FALSE, title = 'GradCAM Feature Cells', Timer_positive = TRUE, ylim = NULL) {
+plotGradCAMFeatureCells <- function(x, feature_cells, p_adjust_method = "BH", ncol = 3, min_cells = 10, title = 'GradCAM Feature Cells', Timer_positive = TRUE, ylim = NULL) {
     
     feature_cells <- as.numeric(feature_cells)
     clusters <- ifelse(feature_cells == 1, "Feature", 'Others')
@@ -528,7 +549,7 @@ plotGradCAMFeatureCells <- function(x, feature_cells, p_adjust_method = "BH", nc
     
     
     
-    p <- ggplot(data_percent, aes(x = group, y = Percentage, fill = group)) +
+    p <- ggplot(data_percent, aes(x = !!sym("group"), y = !!sym("Percentage"), fill = !!sym("group"))) +
     geom_violin(trim = FALSE, alpha = 0.7, adjust = 1.5, width = 1.1)+
     geom_boxplot(width = 0.1, outlier.shape = NA, fill = "white", colour = "black", alpha = 0.5) +
     geom_jitter(width = 0.1, color = "black", size = 1.5, alpha = 0.6, shape = 21, show.legend = FALSE) +
