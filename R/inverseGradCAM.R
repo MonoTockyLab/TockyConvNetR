@@ -277,7 +277,7 @@ convert_to_image <- function(data, n_resolution = 100){
 #' }
 #'
 #' @importFrom dplyr filter mutate
-#' @importFrom graphics rect plot segments text
+#' @importFrom graphics rect plot segments text layout
 #' @importFrom grDevices colorRampPalette
 plotInverseGradCAM <- function(x, feature_matrix, xaxis = 'Red_log', yaxis = 'Blue_log',  xlim = NULL, ylim = NULL, title ='GradCAM', color_bar = TRUE, n_resolution = 100, transpose= TRUE){
     
@@ -497,6 +497,7 @@ plotGradCAMFeatureMFI  <-  function(x, feature_vector, group = NULL, select = FA
 #' @importFrom dplyr group_by summarise mutate ungroup select distinct left_join n %>%
 #' @importFrom gridExtra grid.arrange
 #' @importClassesFrom TockyPrep TockyPrepData
+#' @importFrom rlang .data
 #'
 #' @examples
 #' \dontrun{
@@ -525,14 +526,14 @@ plotGradCAMFeatureCells <- function(x, feature_cells, p_adjust_method = "BH", nc
     data <- merge(data, sampledef, merge = 'file')
     
     data_percent <- data %>%
-    group_by(file, Cluster, group) %>%
-    summarise(Count = n(), .groups = 'drop') %>%
-    group_by(file) %>%
-    mutate(Total = sum(Count)) %>%
-    ungroup() %>%
-    mutate(Percentage = (Count / Total) * 100) %>%
-    select(file, Cluster, group, Percentage)
-    
+        group_by(file, Cluster, .data$group) %>%
+        summarise(Count = n(), .groups = 'drop') %>%
+        group_by(file) %>%
+        mutate(Total = sum(.data$Count)) %>%
+        ungroup() %>%
+        mutate(Percentage = (.data$Count / .data$Total) * 100) %>%
+        select(file, Cluster, .data$group, Percentage)
+
     data_percent <- data_percent[data_percent$Cluster == "Feature",]
     
     summary_data <- data_percent %>%

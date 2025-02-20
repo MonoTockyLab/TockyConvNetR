@@ -21,34 +21,28 @@ Below is a schematic figure providing an overview of the workflows and interacti
 
 <img src="vignettes/assets/Overview.jpg" align="center" width=100%>
 
-### Link to GitHub Pages:
+### Link to GitHub Pages
 
-<div style="display: flex; justify-content: space-between;">
-  <div style="width: 30%; padding: 10px;">
-    <h3>TockyRandomForest</h3>
-    <p>
-	<a href="https://MonoTockyLab.github.io/TockyRandomForest">
-	  <img src="assets/LogoTockyRandomForest.jpg" align="center" width="100%">
+
+
+
+  <a href="https://MonoTockyLab.github.io/TockyRandomForest">
+	  <img src="assets/LogoTockyRandomForest.jpg" align="center" width="30%">
 	</a>
 	</p>
-  </div>
-  <div style="width: 30%; padding: 10px;">
-    <h3>TockyConvNetR</h3>
-    <p>
-	<a href="https://MonoTockyLab.github.io/TockyConvNetR">
-	  <img src="assets/LogoTockyConvNetR.jpg" align="center" width="75%">
+
+
+  <a href="https://MonoTockyLab.github.io/TockyConvNetR">
+	  <img src="assets/LogoTockyConvNetR.jpg" align="center" width="30%">
 	</a>
-	</p>
-  </div>
-  <div style="width: 30%; padding: 10px;">
-    <h3>TockyConvNetPy</h3>
-    <p>
-	<a href="https://MonoTockyLab.github.io/TockyConvNetPy">
-	  <img src="assets/LogoTockyConvNetPy.jpg" align="center" width="75%">
+
+  <a href="https://MonoTockyLab.github.io/TockyConvNetPy">
+	  <img src="assets/LogoTockyConvNetPy.jpg" align="center" width="30%">
 	</a>
-	</p>
-  </div>
 </div>
+
+
+
 
 
 
