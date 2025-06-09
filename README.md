@@ -23,26 +23,18 @@ Below is a schematic figure providing an overview of the workflows and interacti
 
 ### Link to GitHub Pages
 
+<a href="https://MonoTockyLab.github.io/TockyConvNetR">
+  <img src="vignettes/assets/LogoTockyConvNetR.jpg" alt="TockyConvNetR Logo" width="30%" style="display:inline-block; margin-right: 2%;">
+</a>
 
+<a href="https://MonoTockyLab.github.io/TockyConvNetPy">
+  <img src="vignettes/assets/LogoTockyConvNetPy.jpg" alt="TockyConvNetPy Logo" width="30%" style="display:inline-block;">
+</a>
+---
 
-
-  <a href="https://MonoTockyLab.github.io/TockyRandomForest">
-	  <img src="assets/LogoTockyRandomForest.jpg" align="center" width="30%">
-	</a>
-	</p>
-
-
-  <a href="https://MonoTockyLab.github.io/TockyConvNetR">
-	  <img src="assets/LogoTockyConvNetR.jpg" align="center" width="30%">
-	</a>
-
-  <a href="https://MonoTockyLab.github.io/TockyConvNetPy">
-	  <img src="assets/LogoTockyConvNetPy.jpg" align="center" width="30%">
-	</a>
-</div>
-
-
-
+<a href="https://MonoTockyLab.github.io/TockyRandomForest">
+  <img src="vignettes/assets/LogoTockyRF.jpg" alt="TockyRandomForest Logo" width="30%" style="display:inline-block; margin-right: 2%;">
+</a>
 
 
 
